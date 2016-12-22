@@ -1,0 +1,33 @@
+<% if node['platform'] == 'windows' %>
+define ROOT <%= node['nxlog']['root_dir'] %>
+
+ModuleDir %ROOT%/modules
+CacheDir  %ROOT%/data
+Pidfile   %ROOT%/data/nxlog.pid
+SpoolDir  %ROOT%/data
+
+<% # this seems wrong, but it's what works -%>
+Include   %ROOT%/conf/nxlog.conf.d/\\*.conf
+<% else %>
+User      <%= node['nxlog']['user'] %>
+Group     <%= node['nxlog']['group'] %>
+
+Include   <%= node['nxlog']['conf_dir'] %>/nxlog.conf.d/*.conf
+<% end %>
+
+LogLevel  <%= node['nxlog']['log_level'] %>
+LogFile   <%= node['nxlog']['log_file'] %>
+
+<Extension syslog_module>
+  Module xm_syslog
+</Extension>
+
+<Extension _json>
+    Module xm_json
+</Extension>
+
+# defines a null output to work around issue with commas in default output
+# list
+<Output null_output>
+  Module om_null
+</Output>
